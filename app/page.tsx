@@ -1,9 +1,15 @@
-import type { Metadata } from 'next';
-import { ALL_ABOVE, ALL_BELOW, MARKS, repeatMark, imageToMarks, BinaryImageData } from './lib/unicode';
-import imageData from './image-data.json';
-import { CopyButton } from './components/CopyButton';
+import type { Metadata } from "next";
+import { MARKS, imageToMarks, BinaryImageData } from "./lib/unicode";
+import imageData from "./image-data.json";
+import { CopyButton } from "./components/CopyButton";
+import { CharacterCarousel } from "./components/CharacterCarousel";
+import { SideText } from "./components/SideText";
+import { BrowserWarning } from "./components/BrowserWarning";
 
-const pageTitle = imageToMarks(imageData as BinaryImageData, 'oh god ben how did you do this');
+const pageTitle = imageToMarks(
+  imageData as BinaryImageData,
+  "oh god ben how did you do this"
+);
 
 export const metadata: Metadata = {
   title: pageTitle,
@@ -20,148 +26,84 @@ const testImageData: BinaryImageData = {
   ),
 };
 
-// Alternating pattern: 50 threeDots + 50 emptyCenterHigh, repeated 15 times
-function alternatingStack(base: string, count1: number, count2: number, repeats: number): string {
-  const mark1 = MARKS.above.threeDots.repeat(count1);
-  const mark2 = MARKS.above.emptyCenterHigh.repeat(count2);
-  const pattern = (mark1 + mark2).repeat(repeats);
-  return base + pattern;
-}
-
-// Reorder above marks by height (shortest first)
-const priorityOrder = ['roundedHighStop', 'madda', 'meemInitial', 'dotlessHead', 'yeh', 'seen', 'roundedZero', 'emptyCenterHigh', 'rectangularZero', 'threeDots', 'noon', 'sadLamAlef', 'meemIsolated', 'lamAlef', 'jeem'];
-const orderedAbove = [
-  ...ALL_ABOVE.filter(m => priorityOrder.includes(m.name)).sort((a, b) => priorityOrder.indexOf(a.name) - priorityOrder.indexOf(b.name)),
-  ...ALL_ABOVE.filter(m => !priorityOrder.includes(m.name)),
-];
-
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white text-black px-8 pb-8 pt-4">
-      <h1 className="text-2xl font-bold mb-2">Arabic Stacking Marks × 8</h1>
-      <p className="text-zinc-500 mb-8">{ALL_ABOVE.length + ALL_BELOW.length} marks total ({ALL_ABOVE.length} above, {ALL_BELOW.length} below)</p>
-      <div className="overflow-x-auto">
-        <table className="border-separate" style={{ borderSpacing: 0 }}>
-          <thead>
-            <tr>
-              <th className="border border-zinc-300 bg-zinc-100 px-4 py-2 text-left text-sm">Letter</th>
-              {orderedAbove.map(({ name, char }) => (
-                <th key={name} className="border border-zinc-300 bg-zinc-100 px-3 py-2 text-center text-xs">
-                  <div className="whitespace-nowrap">{name}</div>
-                  <div className="text-zinc-500 font-mono">
-                    U+{char.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0')}
-                  </div>
-                </th>
-              ))}
-              <th className="border-l-4 border-l-zinc-400 border border-zinc-300 bg-zinc-200 px-3 py-2 text-center text-xs">
-                <div className="whitespace-nowrap text-zinc-600">BELOW</div>
-              </th>
-              {ALL_BELOW.map(({ name, char }) => (
-                <th key={name} className="border border-zinc-300 bg-zinc-200 px-3 py-2 text-center text-xs">
-                  <div className="whitespace-nowrap">{name}</div>
-                  <div className="text-zinc-500 font-mono">
-                    U+{char.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0')}
-                  </div>
-                </th>
-              ))}
-              <th className="border-l-4 border-l-zinc-400 border border-zinc-300 bg-zinc-300 px-3 py-2 text-center text-xs">
-                <div className="whitespace-nowrap text-zinc-600">SPECIAL</div>
-              </th>
-              <th className="border border-zinc-300 bg-zinc-300 px-3 py-2 text-center text-xs">
-                <div className="whitespace-nowrap">threeDots + emptyCenterHigh</div>
-                <div className="text-zinc-500 font-mono">alternating 1×10</div>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border border-zinc-300 bg-zinc-100 px-4 py-2 text-2xl font-bold text-center">
-                x
-              </td>
-              {orderedAbove.map(({ name, char }) => (
-                <td
-                  key={name}
-                  className="border border-zinc-300 px-4 py-2 text-center text-xl h-32 align-middle"
-                >
-                  {repeatMark('x', char, 8)}
-                </td>
-              ))}
-              <td className="border-l-4 border-l-zinc-400 border border-zinc-300 bg-zinc-200/50"></td>
-              {ALL_BELOW.map(({ name, char }) => (
-                <td
-                  key={name}
-                  className="border border-zinc-300 px-4 py-2 text-center text-xl h-32 align-middle"
-                >
-                  {repeatMark('x', char, 8)}
-                </td>
-              ))}
-              <td className="border-l-4 border-l-zinc-400 border border-zinc-300 bg-zinc-300/50"></td>
-              <td className="border border-zinc-300 px-4 py-2 text-center text-xl h-32 align-middle">
-                {alternatingStack('x', 1, 1, 4)}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <main className="min-h-screen bg-white text-black w-screen overflow-clip relative">
+      <BrowserWarning />
+      <SideText side="left" />
+      <SideText side="right" />
+      <h1 className="text-2xl font-bold mb-2 px-12 pt-4">
+        Stacking Non-Spaced Qur'anic Characters to Commit Text Crimes
+      </h1>
+      <p className="text-zinc-500 mb-4 px-12">
+        How a set of 19 unicode characters generally only seen in the Qur'an
+        broke my assumptions about text rendering
+      </p>
+      <div className="mx-12 mb-8 bg-zinc-200 rounded-lg inline-block max-w-[calc(100%-2rem)]">
+        <img
+          src="/header.png"
+          alt="Header"
+          className="rounded-lg max-w-4xl w-full"
+        />
       </div>
+      <p className="px-12">
+        Months ago I found a twitter bio that had the strange effect of a giant
+        lin{MARKS.above.lamAlef.repeat(50)}e coming out of one of the letters. I
+        figured out it was based around the character{" "}
+        <div className="inline bg-gray-200 rounded-sm pl-px pr-2">
+          <span className=" hidden">_</span>&#1751;
+        </div>{" "}
+        <i>AKA U+06D7 ARABIC LETTER ALEF WITH WAVY HAMZA ABOVE</i>. This
+        character has a couple of unusual properties:
+        <ul className="list-disc pl-5">
+          <li>It&apos;s a zero-width character. It takes up no horizontal space, the characters after it do not move horizontally because of it. These are generally used as special formatting purposes. To turn text right to left you can use U+200F (<i>RIGHT-TO-LEFT MARK</i>) and U+200B (<i>ZERO WIDTH SPACE</i>) has famously caused programmers hell when it causes files to fail compiles for seemingly no reason.</li>
+          <li>It&apos;s a combining mark. Rather than being a standalone character, it attaches to and modifies the preceding character. Common examples include accents like é (e + U+0301 <i>COMBINING ACUTE ACCENT</i>), umlauts like ü (u + U+0308 <i>COMBINING DIAERESIS</i>), and tildes like ñ (n + U+0303 <i>COMBINING TILDE</i>). The base letter and its marks form what Unicode calls a &quot;grapheme cluster&quot; — what we perceive as a single character.</li>
+          <li>It&apos;s stackable. When you place multiple combining marks next to each other, they don&apos;t overwrite — they stack vertically. Most combining marks can only be used one per base character: If I put 100 U+0301 <i>COMBINING ACUTE ACCENT</i> after an &quot;e&quot;, I still just get an &quot;é&quot; with one accent. But with certain characters, including U+06D7 ARABIC LETTER ALEF WITH WAVY HAMZA ABOVE, you can stack multiple instances on top of each other, creating towers{MARKS.above.threeDots.repeat(50)}</li>
+        </ul>
+        
+      </p>
+      <br/>
+      <p className="px-12">
+        After doing a review of unicode characters, I was able to find 19 characters with these traits. 16 stacking upwards, 3 stacking downwards. After looking at them all (and asking ChatGPT), I realized they are all Arabic characters used in the Qur'an, referred to as Tajweed marks.
+      </p>
+      <br/>
+      <CharacterCarousel />
+    <br/>
+    <br/>
+      <h2 className="px-12 text-2xl font-bold ">{MARKS.above.emptyCenterHigh.repeat(10) + MARKS.below.emptyCenter.repeat(10)}Combining Marks and Constructing Images/Patterns{MARKS.above.emptyCenterHigh.repeat(10) + MARKS.below.emptyCenter.repeat(10)}</h2>
+          <br/>
 
-      <div className="mt-32 text-6xl" style={{ marginBottom: '800px' }}>
-        {[...'potato'].map((char, i) => (
-          <span key={i}>
-            {char + (i % 2 === 0 ? MARKS.below.seen.repeat(20) : MARKS.below.lowMeem.repeat(20))}
-          </span>
-        ))}
-      </div>
+      <p className="px-12">
+        These characters stack in two independent directions: the above marks and below marks. You can mix and match any of these marks together, and they&apos;ll continue to grow vertically until you add a non-combining character to reset the stack. This allows for some interesting effects, as you can create tall towers of marks both above and below a base character.
+      </p>
 
-      <div className="mt-32" style={{ marginBottom: '800px', fontFamily: 'Google Sans, Roboto, Arial, sans-serif', fontSize: '20px', fontWeight: 400 }}>
-        {[...'eeeeee'].map((char, i) => (
-          <span key={i}>
-            {char + (i % 2 === 0
-              ? (MARKS.below.seen + MARKS.below.lowMeem).repeat(10)
-              : (MARKS.below.lowMeem + MARKS.below.seen).repeat(10)
-            )}
-          </span>
-        ))}
-      </div>
-
-      <div className="mt-32" style={{ marginBottom: '800px', fontFamily: 'Google Sans, Roboto, Arial, sans-serif', fontSize: '20px', fontWeight: 400 }}>
-        {[...'gggggggggggggggggggg'].map((char, i) => (
-          <span key={i}>
-            {char
-              + (i % 2 === 0
-                ? (MARKS.above.seen + MARKS.above.meemIsolated).repeat(20)
-                : (MARKS.above.meemIsolated + MARKS.above.seen).repeat(20))
-              + (i % 2 === 0
-                ? (MARKS.below.seen + MARKS.below.lowMeem).repeat(20)
-                : (MARKS.below.lowMeem + MARKS.below.seen).repeat(20))
-            }
-          </span>
-        ))}
-      </div>
-
-      <div className="mt-32" style={{ marginBottom: '800px' }}>
-        <h2 className="text-2xl font-bold mb-2">imageToMarks() Test</h2>
-        <p className="text-zinc-500 mb-8">12 columns, 40 height (20 above + 20 below), alternating checkerboard pattern</p>
-        <div style={{ fontFamily: 'Google Sans, Roboto, Arial, sans-serif', fontSize: '20px', fontWeight: 400 }}>
-          {imageToMarks(testImageData, 'g')}
+      <div className="px-12 my-8 grid grid-cols-4 gap-8 text-4xl">
+        <div className="text-center group cursor-pointer">
+          <div className="mb-2">
+            A<span className="text-red-500 opacity-40 group-hover:opacity-100 transition-opacity">{(MARKS.above.seen + MARKS.above.meemIsolated + MARKS.above.threeDots).repeat(5)}</span>
+          </div>
+          <div className="text-sm text-red-500 opacity-40 group-hover:opacity-100 transition-opacity">seen + meemIsolated + threeDots</div>
+        </div>
+        <div className="text-center group cursor-pointer">
+          <div className="mb-2">
+            B<span className="text-blue-500 opacity-40 group-hover:opacity-100 transition-opacity">{(MARKS.above.lamAlef + MARKS.above.jeem + MARKS.above.noon + MARKS.above.emptyCenterHigh).repeat(4)}</span>
+          </div>
+          <div className="text-sm text-blue-500 opacity-40 group-hover:opacity-100 transition-opacity">lamAlef + jeem + noon + emptyCenterHigh</div>
+        </div>
+        <div className="text-center group cursor-pointer">
+          <div className="mb-2">
+            C<span className="text-green-500 opacity-40 group-hover:opacity-100 transition-opacity">{MARKS.below.seen.repeat(7) + MARKS.below.lowMeem.repeat(7)}</span>
+          </div>
+          <div className="text-sm text-green-500 opacity-40 group-hover:opacity-100 transition-opacity">below: seen + lowMeem</div>
+        </div>
+        <div className="text-center group cursor-pointer">
+          <div className="mb-2">
+            D<span className="text-purple-500 opacity-40 group-hover:opacity-100 transition-opacity">{(MARKS.above.seen + MARKS.above.meemIsolated).repeat(5) + (MARKS.below.seen + MARKS.below.lowMeem).repeat(5)}</span>
+          </div>
+          <div className="text-sm text-purple-500 opacity-40 group-hover:opacity-100 transition-opacity">above + below combined</div>
         </div>
       </div>
 
-      <div className="mt-32" style={{ marginBottom: '800px' }}>
-        <h2 className="text-2xl font-bold mb-2">Image Data</h2>
-        <p className="text-zinc-500 mb-8">{imageData.width} columns, {imageData.height} height ({imageData.aboveHeight} above + {imageData.belowHeight} below)</p>
-        <div style={{ fontFamily: 'Google Sans, Roboto, Arial, sans-serif', fontSize: '20px', fontWeight: 400 }}>
-          {pageTitle}
-        </div>
-        <p className="text-zinc-500 mt-4">Character count (.length): {pageTitle.length}</p>
-        <CopyButton text={pageTitle} />
-      </div>
-
-      <div className="mt-32" style={{ marginBottom: '800px' }}>
-        <h2 className="text-2xl font-bold mb-2">Equal H</h2>
-        <div style={{ fontFamily: 'Google Sans, Roboto, Arial, sans-serif', fontSize: '20px', fontWeight: 400 }}>
-          {'g' + MARKS.above.meemIsolated.repeat(38) + MARKS.below.lowMeem.repeat(44) + 'g' + MARKS.above.seen.repeat(50) + MARKS.below.seen.repeat(50)}
-        </div>
-      </div>
     </main>
   );
 }

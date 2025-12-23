@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.carousel-track {
+  animation: scroll 60s linear infinite;
+}
+
+@media screen and (max-width: 640px) {
+  .carousel-track {
+    animation-duration: 40s !important;
+  }
+}
