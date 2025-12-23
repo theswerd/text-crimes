@@ -2,6 +2,19 @@
 // Arabic Qur'anic marks - all are General Category: Mn (Nonspacing Mark)
 // Zero width, attach to preceding grapheme
 
+// Mark height ratios (measured empirically)
+// Reference: 38 meemIsolated = 50 seen (above), 44 lowMeem = 50 seen (below)
+export const MARK_HEIGHTS = {
+  above: {
+    seen: 1.0,            // reference unit
+    meemIsolated: 50 / 38, // ≈ 1.316
+  },
+  below: {
+    seen: 1.0,            // reference unit
+    lowMeem: 50 / 44,     // ≈ 1.136
+  },
+};
+
 export const MARKS = {
   above: {
     // U+06D6–U+06DC: Small High Ligatures & Letters
@@ -107,4 +120,79 @@ export function truncate(text: string, maxGraphemes: number): string {
   const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
   const segments = [...segmenter.segment(text)];
   return segments.slice(0, maxGraphemes).map(s => s.segment).join('');
+}
+
+// Binary image data structure for imageToMarks
+export interface BinaryImageData {
+  width: number;           // Number of columns (characters)
+  height: number;          // Total vertical height (above + below)
+  aboveHeight: number;     // How many rows go above the baseline
+  belowHeight: number;     // How many rows go below the baseline
+  pixels: number[][];      // 2D array: pixels[column][row] = 0 or 1
+                           // row 0 = bottom of below, row (height-1) = top of above
+}
+
+// Convert binary image data to stacked marks
+// 0 = meemIsolated (above) / lowMeem (below) - taller marks
+// 1 = seen (above) / seen (below) - shorter marks
+// Uses equal visual space algorithm: each source pixel occupies the same
+// visual height regardless of its value. Rounding errors propagate forward
+// and get corrected by subsequent pixels.
+// baseText: uses each character in sequence, falls back to '☐' when exhausted
+export function imageToMarks(
+  data: BinaryImageData,
+  baseText: string = 'g'
+): string {
+  const { width, aboveHeight, belowHeight, pixels } = data;
+  const fallbackChar = '☐';
+
+  let result = '';
+
+  for (let col = 0; col < width; col++) {
+    const column = pixels[col] || [];
+    const baseChar = col < baseText.length ? baseText[col] : fallbackChar;
+
+    // Build above marks (rows belowHeight to height-1, from baseline up)
+    // Each pixel should occupy 1.0 seen-units of visual height
+    let aboveMarks = '';
+    let currentHeight = 0;
+
+    for (let row = belowHeight; row < belowHeight + aboveHeight; row++) {
+      const pixelIndex = row - belowHeight;
+      const targetHeight = pixelIndex + 1; // target cumulative height in seen-units
+      const bit = column[row] ?? 0;
+      const mark = bit === 1 ? MARKS.above.seen : MARKS.above.meemIsolated;
+      const markHeight = bit === 1 ? MARK_HEIGHTS.above.seen : MARK_HEIGHTS.above.meemIsolated;
+
+      // Calculate how many marks to emit for this pixel (rounded)
+      const numMarks = Math.round((targetHeight - currentHeight) / markHeight);
+      for (let i = 0; i < numMarks; i++) {
+        aboveMarks += mark;
+      }
+      currentHeight += numMarks * markHeight;
+    }
+
+    // Build below marks (rows 0 to belowHeight-1, from baseline down)
+    let belowMarks = '';
+    currentHeight = 0;
+
+    for (let row = belowHeight - 1; row >= 0; row--) {
+      const pixelIndex = belowHeight - 1 - row;
+      const targetHeight = pixelIndex + 1; // target cumulative height in seen-units
+      const bit = column[row] ?? 0;
+      const mark = bit === 1 ? MARKS.below.seen : MARKS.below.lowMeem;
+      const markHeight = bit === 1 ? MARK_HEIGHTS.below.seen : MARK_HEIGHTS.below.lowMeem;
+
+      // Calculate how many marks to emit for this pixel (rounded)
+      const numMarks = Math.round((targetHeight - currentHeight) / markHeight);
+      for (let i = 0; i < numMarks; i++) {
+        belowMarks += mark;
+      }
+      currentHeight += numMarks * markHeight;
+    }
+
+    result += baseChar + aboveMarks + belowMarks;
+  }
+
+  return result;
 }

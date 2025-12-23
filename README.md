@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# unicoool
 
-## Getting Started
+Create images using Unicode combining marks. Uses Arabic Qur'anic annotation marks that visually stack above and below base characters.
 
-First, run the development server:
+## How It Works
+
+Arabic combining marks (General Category: Mn - Nonspacing Mark) attach to the preceding character and stack vertically. By choosing different marks, we can create binary patterns that render as images.
+
+### Marks Used
+
+**Above baseline:**
+- `ۜ` (U+06DC) - Small High Seen - used for `1` bits
+- `ۢ` (U+06E2) - Small High Meem Isolated Form - used for `0` bits
+
+**Below baseline:**
+- `ۣ` (U+06E3) - Small Low Seen - used for `1` bits
+- `ۭ` (U+06ED) - Small Low Meem - used for `0` bits
+
+### Height Ratios
+
+The marks have different visual heights (measured empirically):
+
+| Position | Mark | Height (seen-units) |
+|----------|------|---------------------|
+| Above | seen (1) | 1.0 |
+| Above | meemIsolated (0) | 50/38 ≈ 1.316 |
+| Below | seen (1) | 1.0 |
+| Below | lowMeem (0) | 50/44 ≈ 1.136 |
+
+The `imageToMarks()` function compensates for these differences using an equal visual space algorithm - each source pixel occupies the same visual height regardless of its 0/1 value.
+
+## Usage
+
+### Image Processing CLI
+
+Convert an image to binary data:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npx ts-node scripts/process-image.ts input.png --width 20 --height 40 --above 20 --below 20
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Options:**
+- `--width` - Number of columns (characters)
+- `--height` - Total height (above + below rows)
+- `--above` - Rows above baseline
+- `--below` - Rows below baseline
+- `--threshold` - Brightness threshold 0-255 (default: 128)
+- `--output` - Output directory
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Outputs:**
+- `{input}-preview.png` - Black/white preview
+- `{input}-data.json` - BinaryImageData JSON
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Using in Code
 
-## Learn More
+```typescript
+import { imageToMarks, BinaryImageData } from './lib/unicode';
 
-To learn more about Next.js, take a look at the following resources:
+const data: BinaryImageData = {
+  width: 10,
+  height: 20,
+  aboveHeight: 10,
+  belowHeight: 10,
+  pixels: [...] // pixels[col][row] = 0 or 1, row 0 = bottom
+};
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+const text = imageToMarks(data, 'g'); // 'g' is the base character
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Development
 
-## Deploy on Vercel
+```bash
+npm install
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open http://localhost:3000 to see the visualization.
