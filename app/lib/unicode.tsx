@@ -1,3 +1,5 @@
+import React from 'react';
+
 // Unicode Combining Marks Library
 // Arabic Qur'anic marks - all are General Category: Mn (Nonspacing Mark)
 // Zero width, attach to preceding grapheme
@@ -132,67 +134,98 @@ export interface BinaryImageData {
                            // row 0 = bottom of below, row (height-1) = top of above
 }
 
+// Options for imageToMarks
+export interface ImageToMarksOptions {
+  markClassName?: string;  // When provided, returns JSX with marks wrapped in styled span
+  skipChars?: string;      // Characters to skip (no marks added), e.g. "' -"
+}
+
 // Convert binary image data to stacked marks
 // 0 = meemIsolated (above) / lowMeem (below) - taller marks
 // 1 = seen (above) / seen (below) - shorter marks
 // Uses equal visual space algorithm: each source pixel occupies the same
 // visual height regardless of its value. Rounding errors propagate forward
 // and get corrected by subsequent pixels.
-// baseText: uses each character in sequence, falls back to '☐' when exhausted
+// baseText: uses each character in sequence, falls back to ' ' when exhausted
 export function imageToMarks(
   data: BinaryImageData,
-  baseText: string = 'g'
-): string {
+  baseText: string = 'g',
+  options?: ImageToMarksOptions
+): string | React.ReactNode {
   const { width, aboveHeight, belowHeight, pixels } = data;
   const fallbackChar = ' ';
 
-  let result = '';
+  // Build column data - include all baseText characters even if beyond image width
+  const totalColumns = Math.max(width, baseText.length);
+  const columns: { baseChar: string; marks: string }[] = [];
 
-  for (let col = 0; col < width; col++) {
+  for (let col = 0; col < totalColumns; col++) {
     const column = pixels[col] || [];
     const baseChar = col < baseText.length ? baseText[col] : fallbackChar;
+    const hasImageData = col < width;
 
-    // Build above marks (rows belowHeight to height-1, from baseline up)
-    // Each pixel should occupy 1.0 seen-units of visual height
+    // Build marks only if we have image data for this column
+    // Skip marks for characters in skipChars
     let aboveMarks = '';
-    let currentHeight = 0;
-
-    for (let row = belowHeight; row < belowHeight + aboveHeight; row++) {
-      const pixelIndex = row - belowHeight;
-      const targetHeight = pixelIndex + 1; // target cumulative height in seen-units
-      const bit = column[row] ?? 0;
-      const mark = bit === 1 ? MARKS.above.seen : MARKS.above.meemIsolated;
-      const markHeight = bit === 1 ? MARK_HEIGHTS.above.seen : MARK_HEIGHTS.above.meemIsolated;
-
-      // Calculate how many marks to emit for this pixel (rounded)
-      const numMarks = Math.round((targetHeight - currentHeight) / markHeight);
-      for (let i = 0; i < numMarks; i++) {
-        aboveMarks += mark;
-      }
-      currentHeight += numMarks * markHeight;
-    }
-
-    // Build below marks (rows 0 to belowHeight-1, from baseline down)
     let belowMarks = '';
-    currentHeight = 0;
+    const shouldSkip = options?.skipChars?.includes(baseChar);
 
-    for (let row = belowHeight - 1; row >= 0; row--) {
-      const pixelIndex = belowHeight - 1 - row;
-      const targetHeight = pixelIndex + 1; // target cumulative height in seen-units
-      const bit = column[row] ?? 0;
-      const mark = bit === 1 ? MARKS.below.seen : MARKS.below.lowMeem;
-      const markHeight = bit === 1 ? MARK_HEIGHTS.below.seen : MARK_HEIGHTS.below.lowMeem;
+    if (hasImageData && !shouldSkip) {
+      // Build above marks (rows belowHeight to height-1, from baseline up)
+      // Each pixel should occupy 1.0 seen-units of visual height
+      let currentHeight = 0;
 
-      // Calculate how many marks to emit for this pixel (rounded)
-      const numMarks = Math.round((targetHeight - currentHeight) / markHeight);
-      for (let i = 0; i < numMarks; i++) {
-        belowMarks += mark;
+      for (let row = belowHeight; row < belowHeight + aboveHeight; row++) {
+        const pixelIndex = row - belowHeight;
+        const targetHeight = pixelIndex + 1; // target cumulative height in seen-units
+        const bit = column[row] ?? 0;
+        const mark = bit === 1 ? MARKS.above.seen : MARKS.above.meemIsolated;
+        const markHeight = bit === 1 ? MARK_HEIGHTS.above.seen : MARK_HEIGHTS.above.meemIsolated;
+
+        // Calculate how many marks to emit for this pixel (rounded)
+        const numMarks = Math.round((targetHeight - currentHeight) / markHeight);
+        for (let i = 0; i < numMarks; i++) {
+          aboveMarks += mark;
+        }
+        currentHeight += numMarks * markHeight;
       }
-      currentHeight += numMarks * markHeight;
+
+      // Build below marks (rows 0 to belowHeight-1, from baseline down)
+      currentHeight = 0;
+
+      for (let row = belowHeight - 1; row >= 0; row--) {
+        const pixelIndex = belowHeight - 1 - row;
+        const targetHeight = pixelIndex + 1; // target cumulative height in seen-units
+        const bit = column[row] ?? 0;
+        const mark = bit === 1 ? MARKS.below.seen : MARKS.below.lowMeem;
+        const markHeight = bit === 1 ? MARK_HEIGHTS.below.seen : MARK_HEIGHTS.below.lowMeem;
+
+        // Calculate how many marks to emit for this pixel (rounded)
+        const numMarks = Math.round((targetHeight - currentHeight) / markHeight);
+        for (let i = 0; i < numMarks; i++) {
+          belowMarks += mark;
+        }
+        currentHeight += numMarks * markHeight;
+      }
     }
 
-    result += baseChar + aboveMarks + belowMarks;
+    columns.push({ baseChar, marks: aboveMarks + belowMarks });
   }
 
-  return result;
+  // Return JSX if markClassName is provided
+  if (options?.markClassName) {
+    return (
+      <>
+        {columns.map((col, i) => (
+          <React.Fragment key={i}>
+            {col.baseChar}
+            <span className={options.markClassName}>{col.marks}</span>
+          </React.Fragment>
+        ))}
+      </>
+    );
+  }
+
+  // Return plain string for backward compatibility
+  return columns.map(col => col.baseChar + col.marks).join('');
 }

@@ -10,9 +10,11 @@ import { BrowserWarning } from "./components/BrowserWarning";
 import { Checkerboard } from "./components/Checkerboard";
 import { InlineMark } from "./components/InlineMark";
 
+const titleText = "Stacking Non-Spaced Qur'anic Characters to Commit Text Crimes";
+
 const pageTitle = imageToMarks(
   imageData as BinaryImageData,
-  "Stacking Non-Spaced Qur'anic Characters to Commit Text Crimes"
+  titleText
 );
 
 const dogImg = imageToMarks(
@@ -30,8 +32,17 @@ const treeImg = imageToMarks(
   ""
 );
 
+const titleTreeImg = imageToMarks(
+  treeImageData as BinaryImageData,
+  titleText,
+  { markClassName: "text-gray-200", skipChars: "' -" }
+);
+
 export const metadata: Metadata = {
-  title: pageTitle,
+  title: pageTitle as string,
+  verification: {
+    google: "4mkggqWBj3nxBYJ7D0kPYnhAgiDO9DqrFyGSDJY5eBg",
+  },
 };
 
 // Test data: simple alternating pattern
@@ -52,10 +63,10 @@ export default function Home() {
       <SideText side="left" />
       <SideText side="right" />
       <h1 className="text-2xl font-bold mb-2 px-12 pt-4">
-        Stacking Non-Spaced Qur'anic Characters to Commit Text Crimes
+        {titleTreeImg}
       </h1>
       <p className="text-zinc-500 mb-4 px-12">
-        A set of 19 unicode characters generally only seen in the Qur'an
+        A set of 18 unicode characters generally only seen in the Qur'an
         broke my assumptions about text rendering
       </p>
       <div className="mx-12 mb-8 bg-zinc-200 rounded-lg inline-block max-w-[calc(100%-2rem)]">
@@ -135,23 +146,33 @@ export default function Home() {
         Based on this, I wrote a simple program to take images, turn them into black/white bitmaps, and convert those bitmaps into stacking marks.
       </p>
 
-      <div className="px-12 my-24">
+      <div className="px-12 mt-20 text-[6px] xs:text-[12px] sm:text-[16px]">
         <div
           className="flex justify-center"
           style={{
             fontFamily: 'var(--font-geist), sans-serif',
-            fontSize: '20px',
           }}
         >
-          {dogImg} 
+          {dogImg}
           <div className="w-8"/>
           {demonImg}
           <div className="w-8"/>
           {treeImg}
         </div>
+        <div className="flex justify-center gap-8 mt-8 sm:mt-24 sm:gap-16">
+          <img src="/image-preview.png" alt="Dog" className="h-10 sm:h-20" />
+          <img src="/demon-preview.png" alt="Demon" className="h-10 sm:h-20" />
+          <img src="/tree-preview.png" alt="Tree" className="h-10 sm:h-20" />
+        </div>
       </div>
           <br/>
-          <br/>
+            <h1 className="text-2xl font-bold mb-2 px-12 ">
+        Behavior Across Platforms and Browsers
+      </h1>
+      <p className="px-12 mb-20">
+          I first noticed these characters rendering strangely on Twitter.
+      </p>
+      <br/>
     </main>
   );
 }

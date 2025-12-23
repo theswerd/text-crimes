@@ -8,7 +8,7 @@ export function SideText({ side }: { side: 'left' | 'right' }) {
 
   return (
     <div
-      className="absolute bottom-0 text-2xl z-50 -rotate-[1.05deg] text-gray-400"
+      className="absolute bottom-0 text-2xl z-50 -rotate-[1.15deg] text-gray-400"
       style={{
         [side]: side === 'left' ? '20px': '30px',
       }}
