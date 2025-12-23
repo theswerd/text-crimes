@@ -144,7 +144,7 @@ export function imageToMarks(
   baseText: string = 'g'
 ): string {
   const { width, aboveHeight, belowHeight, pixels } = data;
-  const fallbackChar = '☐';
+  const fallbackChar = ' ';
 
   let result = '';
 

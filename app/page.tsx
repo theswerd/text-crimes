@@ -1,14 +1,33 @@
 import type { Metadata } from "next";
 import { MARKS, imageToMarks, BinaryImageData } from "./lib/unicode";
 import imageData from "./image-data.json";
+import demonImageData from "./demon-data.json";
+import treeImageData from "./tree-data.json";
 import { CopyButton } from "./components/CopyButton";
 import { CharacterCarousel } from "./components/CharacterCarousel";
 import { SideText } from "./components/SideText";
 import { BrowserWarning } from "./components/BrowserWarning";
+import { Checkerboard } from "./components/Checkerboard";
+import { InlineMark } from "./components/InlineMark";
 
 const pageTitle = imageToMarks(
   imageData as BinaryImageData,
-  "oh god ben how did you do this"
+  "Stacking Non-Spaced Qur'anic Characters to Commit Text Crimes"
+);
+
+const dogImg = imageToMarks(
+  imageData as BinaryImageData,
+  ""
+);
+
+const demonImg = imageToMarks(
+  demonImageData as BinaryImageData,
+  ""
+);
+
+const treeImg = imageToMarks(
+  treeImageData as BinaryImageData,
+  ""
 );
 
 export const metadata: Metadata = {
@@ -36,7 +55,7 @@ export default function Home() {
         Stacking Non-Spaced Qur'anic Characters to Commit Text Crimes
       </h1>
       <p className="text-zinc-500 mb-4 px-12">
-        How a set of 19 unicode characters generally only seen in the Qur'an
+        A set of 19 unicode characters generally only seen in the Qur'an
         broke my assumptions about text rendering
       </p>
       <div className="mx-12 mb-8 bg-zinc-200 rounded-lg inline-block max-w-[calc(100%-2rem)]">
@@ -50,9 +69,7 @@ export default function Home() {
         Months ago I found a twitter bio that had the strange effect of a giant
         lin{MARKS.above.lamAlef.repeat(50)}e coming out of one of the letters. I
         figured out it was based around the character{" "}
-        <div className="inline bg-gray-200 rounded-sm pl-px pr-2">
-          <span className=" hidden">_</span>&#1751;
-        </div>{" "}
+        <InlineMark><span className="hidden">_</span>&#1751;</InlineMark>{" "}
         <i>AKA U+06D7 ARABIC LETTER ALEF WITH WAVY HAMZA ABOVE</i>. This
         character has a couple of unusual properties:
         <ul className="list-disc pl-5">
@@ -103,7 +120,38 @@ export default function Home() {
           <div className="text-sm text-purple-500 opacity-40 group-hover:opacity-100 transition-opacity">above + below combined</div>
         </div>
       </div>
+        <br/>
 
+      <p className="px-12">
+        As a series of unique characters, using the density of their coloring you can draw images or patterns with them using the same techniques as ASCII art. As a simple POC, I took two of the three characters that have an above and equivalent below mark that had approximately the same height — <InlineMark>{'-' + MARKS.above.seen + MARKS.below.seen}</InlineMark> (seen) and <InlineMark>{'-' + MARKS.above.meemIsolated + MARKS.below.lowMeem}</InlineMark> (meemIsolated/lowMeem) — and created a simple checkerboard pattern:
+      </p>
+
+      <div className="px-12 my-10 flex justify-center">
+        <Checkerboard columns={20} height={4} />
+      </div>
+      <br/>
+      
+      <p className="px-12">
+        Based on this, I wrote a simple program to take images, turn them into black/white bitmaps, and convert those bitmaps into stacking marks.
+      </p>
+
+      <div className="px-12 my-24">
+        <div
+          className="flex justify-center"
+          style={{
+            fontFamily: 'var(--font-geist), sans-serif',
+            fontSize: '20px',
+          }}
+        >
+          {dogImg} 
+          <div className="w-8"/>
+          {demonImg}
+          <div className="w-8"/>
+          {treeImg}
+        </div>
+      </div>
+          <br/>
+          <br/>
     </main>
   );
 }
