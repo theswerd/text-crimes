@@ -175,6 +175,9 @@ export default function Home() {
           
         
           </li>
+          <li>
+            <h3 className="inline-block font-bold">GitHub</h3> GitHub seems to render these correctly in most places, but in some places (like issue titles) it will cut off the overflow making it look like a glitchy underline
+          </li>
          </ul>
       </p>
       <br/>
