@@ -2,7 +2,7 @@
 
 Source code for my blog post about using Arabic Qur'anic combining marks to create images in plain text.
 
-**Read the post:** https://unicoool.vercel.app
+**Read the post:** https://zw.swerdlow.dev
 
 ## What is this?
 
