@@ -21,8 +21,7 @@ import { BrowserWarning } from "./components/BrowserWarning";
 import { Checkerboard } from "./components/Checkerboard";
 import { InlineMark } from "./components/InlineMark";
 
-const titleText =
-  "Stacking Non-Spaced Qur'anic Characters to Commit Text Crimes";
+const titleText = "Drawing with Zero-Width Characters";
 
 const pageTitle = imageToMarks(imageData as BinaryImageData, titleText);
 
@@ -81,7 +80,16 @@ export default function Home() {
         </div>
       </div>
       <p className="px-12">
-        The image above is a single line of white spaces with a viewbox height of 3 pixels according to the browser. Using a set of unicode characters I can make images like that, and break other website's assumptions about where text should be rendered.
+        The image above is a single line of white spaces with a viewbox height of 3 pixels according to the browser. Using a set of unicode characters I can make images like that, and break other website's assumptions about where text should be {[..."rendered"].map((char, i) => (
+          <span key={i} className="group/rendered">
+            {char}
+            {i % 2 === 0 && (
+              <span className="text-gray-400 group-hover/rendered:text-red-500 transition-colors">
+                {(MARKS.above.sadLamAlef.repeat(4) + MARKS.above.meemInitial.repeat(4)).repeat(2) + MARKS.above.sadLamAlef.repeat(4)}
+              </span>
+            )}
+          </span>
+        ))}.
       </p>
       <p className="px-12 mt-4">
 
