@@ -170,7 +170,12 @@ export default function Home() {
         Behavior Across Platforms and Browsers
       </h1>
       <p className="px-12 mb-20">
-          I first noticed these characters rendering strangely on Twitter.
+        <ul>
+         <li><h3 className="inline-block font-bold">Twitter</h3> I first noticed these characters rendering strangely on Twitter. Twitter has since patched their CSS to not let it work in all the places it used to, but it still messes with notifications recieved from users who have it in their bio
+          
+        
+          </li>
+         </ul>
       </p>
       <br/>
     </main>
