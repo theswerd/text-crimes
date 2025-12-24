@@ -314,7 +314,7 @@ export default function Home() {
         </div>
       </div>
       <h2 className="text-2xl font-bold mb-2 px-12 ">
-        Behavior Across Platforms and Browsers
+        Behavior Across Platforms
       </h2>
       <p className="px-12">
         <ul>
