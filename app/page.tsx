@@ -20,6 +20,7 @@ import { SideText } from "./components/SideText";
 import { BrowserWarning } from "./components/BrowserWarning";
 import { Checkerboard } from "./components/Checkerboard";
 import { InlineMark } from "./components/InlineMark";
+import { ImageProcessor } from "./browser-processor/ImageProcessor";
 
 const titleText = "Drawing with Zero-Width Characters";
 
@@ -80,20 +81,26 @@ export default function Home() {
         </div>
       </div>
       <p className="px-12">
-        The image above is a single line of white spaces with a viewbox height of 3 pixels according to the browser. Using a set of unicode characters I can make images like that, and break other website's assumptions about where text should be {[..."rendered"].map((char, i) => (
+        The image above is a single line of white spaces with a viewbox height
+        of 3 pixels according to the browser. Using a set of unicode characters
+        I can make images like that, and break other website's assumptions about
+        where text should be{" "}
+        {[..."rendered"].map((char, i) => (
           <span key={i} className="group/rendered">
             {char}
             {i % 2 === 0 && (
               <span className="text-gray-400 group-hover/rendered:text-red-500 transition-colors">
-                {(MARKS.above.sadLamAlef.repeat(4) + MARKS.above.meemInitial.repeat(4)).repeat(2) + MARKS.above.sadLamAlef.repeat(4)}
+                {(
+                  MARKS.above.sadLamAlef.repeat(4) +
+                  MARKS.above.meemInitial.repeat(4)
+                ).repeat(2) + MARKS.above.sadLamAlef.repeat(4)}
               </span>
             )}
           </span>
-        ))}.
+        ))}
+        .
       </p>
       <p className="px-12 mt-4">
-
-
         Months ago I found a twitter bio that had the strange effect of a giant
         lin{MARKS.above.lamAlef.repeat(50)}e coming out of one of the letters. I
         figured out it was based around the character{" "}
@@ -270,8 +277,10 @@ export default function Home() {
         and convert it into marks like these. Despite these strings having a
         length of thousands of characters and rendering to this, the dom
         registers their text as a series of empty spaces; these entire images
-        are just a single line of text. If you're interested you can try the
-        calibrator{" "}
+        are just a single line of text. Calibration worked by taking all of the
+        symbols and lining up 50 of each of them side by side, then adjusting
+        the amounts of them till they all had approximately the same height. If
+        you're interested you can try the calibrator{" "}
         <a href="/calibrate" className="underline group">
           {[..."here"].map((char, i) => (
             <span key={i}>
@@ -286,6 +295,7 @@ export default function Home() {
             </span>
           ))}
         </a>
+        .
       </p>
       <div className="mx-12 mt-4 sm:mt-8 mb-8 inline-grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="bg-zinc-100 rounded-lg flex items-end h-42 sm:h-50 overflow-clip w-fit ">
@@ -389,6 +399,9 @@ export default function Home() {
         ignored by it. However it doesn&apos;t ignore them — when overflow is
         set to none or hidden the marks are clipped outside of the bounding box.
       </p>
+      <div className="px-12 my-12">
+        <ImageProcessor />
+      </div>
       <div className="px-12">
         <div className="border rounded-md w-full h-18 border-dashed border-gray-400 flex items-center flex-row px-2 py-2">
           <div
@@ -401,17 +414,34 @@ export default function Home() {
             <div className=" flex-col hidden sm:flex">
               <span className="text-lg">Written by Benjamin Swerdlow</span>
               <span className="">
-                Thank you for reading, I really enjoyed writing this. Source code is available <a href="https://github.com/theswerd/text-crimes" className="underline group">{[..."here"].map((char, i) => (
-                  <span key={i}>
-                    {char}
-                    <span className="text-orange-400 group-hover:text-red-500 transition-colors">
-                      {(MARKS.above.seen + MARKS.above.meemIsolated + MARKS.above.threeDots + MARKS.above.lamAlef + MARKS.above.jeem).repeat(2)}
+                Thank you for reading, I really enjoyed writing this. Source
+                code is available{" "}
+                <a
+                  href="https://github.com/theswerd/text-crimes"
+                  className="underline group"
+                >
+                  {[..."here"].map((char, i) => (
+                    <span key={i}>
+                      {char}
+                      <span className="text-orange-400 group-hover:text-red-500 transition-colors">
+                        {(
+                          MARKS.above.seen +
+                          MARKS.above.meemIsolated +
+                          MARKS.above.threeDots +
+                          MARKS.above.lamAlef +
+                          MARKS.above.jeem
+                        ).repeat(2)}
+                      </span>
+                      <span className="text-yellow-400 group-hover:text-orange-500 transition-colors">
+                        {(
+                          MARKS.below.seen +
+                          MARKS.below.lowMeem +
+                          MARKS.below.emptyCenter
+                        ).repeat(3)}
+                      </span>
                     </span>
-                    <span className="text-yellow-400 group-hover:text-orange-500 transition-colors">
-                      {(MARKS.below.seen + MARKS.below.lowMeem + MARKS.below.emptyCenter).repeat(3)}
-                    </span>
-                  </span>
-                ))}</a>
+                  ))}
+                </a>
               </span>
             </div>
           </div>
