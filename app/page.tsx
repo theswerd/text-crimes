@@ -391,7 +391,7 @@ export default function Home() {
       </h2>
       <p className="px-12 mb-8">
         As extremely rare characters, many fonts just ignore them. Other
-        font&apos;s like Verdana (the font hacker news uses) renders these
+        fonts like Verdana (the font hacker news uses) renders these
         characters inline/non vertically stacked. One of the unique properties
         about these is despite obviously taking up space, they don&apos;t modify
         the bounding box of the text they are attached to. While most text would
